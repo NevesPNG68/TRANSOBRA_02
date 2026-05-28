@@ -56,6 +56,379 @@ body.premise-closed .premissas-back{display:none}
 @media(max-width:1120px){.header-actions{display:flex;gap:8px;flex-wrap:wrap}.header-inner{align-items:flex-start;flex-direction:column}.header-actions .btn{padding:9px 11px;font-size:12px}}
 
 @media print{.controls,.header-actions{display:none}.header{position:relative}body{background:#fff;color:#111827}.card{box-shadow:none;break-inside:avoid}}
+
+
+/* Efeito neon: borda acesa + luz interna ao passar mouse ou tocar */
+.card,
+.scenario-card,
+.kpi,
+.audit-card,
+.growth-card,
+.insight{
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  transition:transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease;
+}
+.card > *,
+.scenario-card > *,
+.kpi > *,
+.audit-card > *,
+.growth-card > *,
+.insight > *{
+  position:relative;
+  z-index:1;
+}
+.card::before,
+.scenario-card::before,
+.kpi::before,
+.audit-card::before,
+.growth-card::before,
+.insight::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(157,255,0,.24), rgba(34,211,238,.15) 26%, rgba(244,114,182,.08) 42%, transparent 62%),
+    linear-gradient(135deg, rgba(157,255,0,.06), transparent 40%, rgba(34,211,238,.06));
+  transition:opacity .22s ease;
+}
+.card:hover,
+.scenario-card:hover,
+.kpi:hover,
+.audit-card:hover,
+.growth-card:hover,
+.insight:hover,
+.card:focus-within,
+.scenario-card:focus-within,
+.kpi:focus-within,
+.audit-card:focus-within,
+.growth-card:focus-within,
+.insight:focus-within,
+.card.touch-glow,
+.scenario-card.touch-glow,
+.kpi.touch-glow,
+.audit-card.touch-glow,
+.growth-card.touch-glow,
+.insight.touch-glow{
+  transform:translateY(-2px);
+  border-color:rgba(157,255,0,.78)!important;
+  box-shadow:
+    0 0 0 1px rgba(157,255,0,.34),
+    inset 0 0 28px rgba(157,255,0,.17),
+    inset 0 0 58px rgba(34,211,238,.12),
+    0 22px 62px rgba(0,0,0,.40),
+    0 0 42px rgba(157,255,0,.10);
+}
+.card:hover::before,
+.scenario-card:hover::before,
+.kpi:hover::before,
+.audit-card:hover::before,
+.growth-card:hover::before,
+.insight:hover::before,
+.card:focus-within::before,
+.scenario-card:focus-within::before,
+.kpi:focus-within::before,
+.audit-card:focus-within::before,
+.growth-card:focus-within::before,
+.insight:focus-within::before,
+.card.touch-glow::before,
+.scenario-card.touch-glow::before,
+.kpi.touch-glow::before,
+.audit-card.touch-glow::before,
+.growth-card.touch-glow::before,
+.insight.touch-glow::before{
+  opacity:1;
+}
+@media (hover:none){
+  .card:hover,
+  .scenario-card:hover,
+  .kpi:hover,
+  .audit-card:hover,
+  .growth-card:hover,
+  .insight:hover{
+    transform:none;
+  }
+}
+
+
+
+/* Glow com a cor própria de cada borda/card */
+.card,
+.scenario-card,
+.kpi,
+.audit-card,
+.growth-card,
+.insight,
+.input-row,
+details{
+  --edge-rgb:255,214,10;
+  --edge-soft:rgba(var(--edge-rgb),.18);
+  --edge-mid:rgba(var(--edge-rgb),.42);
+  --edge-strong:rgba(var(--edge-rgb),.92);
+  border-color:rgba(var(--edge-rgb),.22);
+}
+.controls{--edge-rgb:34,211,238;}
+.card.chart-card:nth-of-type(odd){--edge-rgb:34,211,238;}
+.card.chart-card:nth-of-type(even){--edge-rgb:157,255,0;}
+.scenario-card.pess{--edge-rgb:251,113,133;border-color:rgba(251,113,133,.40)!important;--glow:rgba(251,113,133,.35);}
+.scenario-card.mod{--edge-rgb:34,211,238;border-color:rgba(34,211,238,.40)!important;--glow:rgba(34,211,238,.35);}
+.scenario-card.opt{--edge-rgb:157,255,0;border-color:rgba(157,255,0,.40)!important;--glow:rgba(157,255,0,.35);}
+.kpi:has(.value.yellow){--edge-rgb:255,214,10;}
+.kpi:has(.value.lime){--edge-rgb:157,255,0;}
+.kpi:has(.value.cyan){--edge-rgb:34,211,238;}
+.kpi:has(.value.pink){--edge-rgb:244,114,182;}
+.audit-card:nth-child(1){--edge-rgb:255,214,10;}
+.audit-card:nth-child(2){--edge-rgb:157,255,0;}
+.audit-card:nth-child(3){--edge-rgb:244,114,182;}
+.growth-card:nth-child(1){--edge-rgb:251,113,133;}
+.growth-card:nth-child(2){--edge-rgb:34,211,238;}
+.growth-card:nth-child(3){--edge-rgb:157,255,0;}
+.insight.sev-Alta{--edge-rgb:251,113,133;}
+.insight.sev-Média{--edge-rgb:255,214,10;}
+.insight.sev-Baixa{--edge-rgb:52,211,153;}
+.input-row:has(.input-title){--edge-rgb:34,211,238;}
+.input-row:has(.input-title){border-color:rgba(var(--edge-rgb),.18);}
+
+.card::before,
+.scenario-card::before,
+.kpi::before,
+.audit-card::before,
+.growth-card::before,
+.insight::before,
+.input-row::before,
+details::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+  opacity:0;
+  z-index:0;
+  background:
+    radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(var(--edge-rgb),.36), rgba(var(--edge-rgb),.18) 24%, transparent 58%),
+    linear-gradient(135deg, rgba(var(--edge-rgb),.10), transparent 38%, rgba(var(--edge-rgb),.06));
+  transition:opacity .22s ease;
+}
+.input-row,
+details{position:relative;overflow:hidden;isolation:isolate;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease,background .22s ease;}
+.input-row > *,
+details > *{position:relative;z-index:1;}
+
+.card:hover,
+.scenario-card:hover,
+.kpi:hover,
+.audit-card:hover,
+.growth-card:hover,
+.insight:hover,
+.input-row:hover,
+details:hover,
+.card:focus-within,
+.scenario-card:focus-within,
+.kpi:focus-within,
+.audit-card:focus-within,
+.growth-card:focus-within,
+.insight:focus-within,
+.input-row:focus-within,
+details:focus-within,
+.card.touch-glow,
+.scenario-card.touch-glow,
+.kpi.touch-glow,
+.audit-card.touch-glow,
+.growth-card.touch-glow,
+.insight.touch-glow,
+.input-row.touch-glow,
+details.touch-glow{
+  transform:translateY(-2px);
+  border-color:var(--edge-strong)!important;
+  box-shadow:
+    0 0 0 1px rgba(var(--edge-rgb),.48),
+    inset 0 0 0 1px rgba(var(--edge-rgb),.26),
+    inset 0 0 30px rgba(var(--edge-rgb),.22),
+    inset 0 0 70px rgba(var(--edge-rgb),.10),
+    0 18px 56px rgba(0,0,0,.42),
+    0 0 44px rgba(var(--edge-rgb),.22);
+}
+.card:hover::before,
+.scenario-card:hover::before,
+.kpi:hover::before,
+.audit-card:hover::before,
+.growth-card:hover::before,
+.insight:hover::before,
+.input-row:hover::before,
+details:hover::before,
+.card:focus-within::before,
+.scenario-card:focus-within::before,
+.kpi:focus-within::before,
+.audit-card:focus-within::before,
+.growth-card:focus-within::before,
+.insight:focus-within::before,
+.input-row:focus-within::before,
+details:focus-within::before,
+.card.touch-glow::before,
+.scenario-card.touch-glow::before,
+.kpi.touch-glow::before,
+.audit-card.touch-glow::before,
+.growth-card.touch-glow::before,
+.insight.touch-glow::before,
+.input-row.touch-glow::before,
+details.touch-glow::before{
+  opacity:1;
+}
+
+
+
+/* Borda superior neon no estilo dos cards de referência: a cor da própria borda acende no hover/touch */
+.card,
+.scenario-card,
+.kpi,
+.audit-card,
+.growth-card,
+.insight,
+.input-row,
+details{
+  border:1px solid rgba(var(--edge-rgb),.22)!important;
+  border-top:4px solid rgba(var(--edge-rgb),.96)!important;
+  background:
+    linear-gradient(180deg, rgba(var(--edge-rgb),.055), rgba(17,24,39,.92) 30%, rgba(15,23,42,.94))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 10px 24px rgba(var(--edge-rgb),.055),
+    0 18px 52px rgba(0,0,0,.30)!important;
+  transition:transform .24s ease,border-color .24s ease,box-shadow .24s ease,background .24s ease,filter .24s ease;
+}
+
+/* mantém o topo colorido arredondado, sem virar borda neon em volta inteira */
+.card::after,
+.scenario-card::after,
+.kpi::after,
+.audit-card::after,
+.growth-card::after,
+.insight::after,
+.input-row::after,
+details::after{
+  content:"";
+  position:absolute;
+  left:18px;
+  right:18px;
+  top:-3px;
+  height:7px;
+  border-radius:999px;
+  pointer-events:none;
+  opacity:.42;
+  z-index:0;
+  background:linear-gradient(90deg, transparent, rgba(var(--edge-rgb),.95) 18%, rgba(var(--edge-rgb),.95) 82%, transparent);
+  filter:blur(7px);
+  transition:opacity .24s ease, filter .24s ease, left .24s ease, right .24s ease;
+}
+
+/* brilho interno fica da mesma cor da borda */
+.card::before,
+.scenario-card::before,
+.kpi::before,
+.audit-card::before,
+.growth-card::before,
+.insight::before,
+.input-row::before,
+details::before{
+  background:
+    radial-gradient(circle at var(--mx,50%) var(--my,8%), rgba(var(--edge-rgb),.30), rgba(var(--edge-rgb),.13) 24%, transparent 56%),
+    linear-gradient(180deg, rgba(var(--edge-rgb),.14), transparent 42%)!important;
+}
+
+.card:hover,
+.scenario-card:hover,
+.kpi:hover,
+.audit-card:hover,
+.growth-card:hover,
+.insight:hover,
+.input-row:hover,
+details:hover,
+.card:focus-within,
+.scenario-card:focus-within,
+.kpi:focus-within,
+.audit-card:focus-within,
+.growth-card:focus-within,
+.insight:focus-within,
+.input-row:focus-within,
+details:focus-within,
+.card.touch-glow,
+.scenario-card.touch-glow,
+.kpi.touch-glow,
+.audit-card.touch-glow,
+.growth-card.touch-glow,
+.insight.touch-glow,
+.input-row.touch-glow,
+details.touch-glow{
+  transform:translateY(-3px);
+  border-color:rgba(var(--edge-rgb),.38)!important;
+  border-top-color:rgba(var(--edge-rgb),1)!important;
+  background:
+    linear-gradient(180deg, rgba(var(--edge-rgb),.115), rgba(17,24,39,.94) 33%, rgba(15,23,42,.96))!important;
+  box-shadow:
+    0 -1px 0 rgba(var(--edge-rgb),.95),
+    0 0 0 1px rgba(var(--edge-rgb),.22),
+    inset 0 12px 34px rgba(var(--edge-rgb),.22),
+    inset 0 0 54px rgba(var(--edge-rgb),.08),
+    0 24px 70px rgba(0,0,0,.46),
+    0 0 48px rgba(var(--edge-rgb),.26)!important;
+}
+
+.card:hover::after,
+.scenario-card:hover::after,
+.kpi:hover::after,
+.audit-card:hover::after,
+.growth-card:hover::after,
+.insight:hover::after,
+.input-row:hover::after,
+details:hover::after,
+.card:focus-within::after,
+.scenario-card:focus-within::after,
+.kpi:focus-within::after,
+.audit-card:focus-within::after,
+.growth-card:focus-within::after,
+.insight:focus-within::after,
+.input-row:focus-within::after,
+details:focus-within::after,
+.card.touch-glow::after,
+.scenario-card.touch-glow::after,
+.kpi.touch-glow::after,
+.audit-card.touch-glow::after,
+.growth-card.touch-glow::after,
+.insight.touch-glow::after,
+.input-row.touch-glow::after,
+details.touch-glow::after{
+  opacity:1;
+  filter:blur(11px);
+  left:8px;
+  right:8px;
+}
+
+/* Cores específicas para aproximar o padrão visual do print de referência */
+.card:has(#scenarioCards){--edge-rgb:34,211,238;}
+.card:has(#focusKpis){--edge-rgb:157,255,0;}
+.card:has(#auditBox){--edge-rgb:244,114,182;}
+.card:has(#dreSummaryTable){--edge-rgb:255,214,10;}
+.card:has(#annualTable){--edge-rgb:167,139,250;}
+.card:has(#monthlyTable){--edge-rgb:34,211,238;}
+.card:has(#insightsGrid){--edge-rgb:157,255,0;}
+
+/* Cards internos mantêm cor própria */
+.scenario-card.pess{--edge-rgb:251,113,133!important;}
+.scenario-card.mod{--edge-rgb:34,211,238!important;}
+.scenario-card.opt{--edge-rgb:157,255,0!important;}
+.kpi:nth-child(1){--edge-rgb:34,211,238;}
+.kpi:nth-child(2){--edge-rgb:255,214,10;}
+.kpi:nth-child(3){--edge-rgb:157,255,0;}
+.kpi:nth-child(4){--edge-rgb:244,114,182;}
+
+/* Evita que o brilho superior atrapalhe tabelas */
+.table-wrap::after, .table-wrap::before{display:none!important;}
+
 </style>
 </head>
 <body class="premise-closed">
@@ -377,6 +750,53 @@ function updateDashboard(){
   renderGrowthRates();renderCards(sums);renderFocusKpis(sums,h);renderAudit(sums);renderDreTable(sums);renderAnnualTable(data[state.focusScenario]);renderMonthlyTable(data[state.focusScenario],h);renderInsights();createCharts(data,sums,h);
 }
 document.addEventListener('DOMContentLoaded',()=>{buildPremissasUI();updateDashboard();});
+
+
+// Efeito neon móvel nos cards: a luz acompanha mouse/dedo.
+(function(){
+  const selector = '.card, .scenario-card, .kpi, .audit-card, .growth-card, .insight, .input-row, details';
+  let raf = null;
+  let lastEvent = null;
+
+  function applyGlow(e){
+    const card = e.target.closest(selector);
+    if(!card) return;
+    const rect = card.getBoundingClientRect();
+    if(!rect.width || !rect.height) return;
+    const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+    const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+    card.style.setProperty('--mx', x.toFixed(2) + '%');
+    card.style.setProperty('--my', y.toFixed(2) + '%');
+  }
+
+  document.addEventListener('pointermove', function(e){
+    lastEvent = e;
+    if(raf) return;
+    raf = requestAnimationFrame(function(){
+      applyGlow(lastEvent);
+      raf = null;
+    });
+  }, {passive:true});
+
+  document.addEventListener('pointerdown', function(e){
+    const card = e.target.closest(selector);
+    if(!card) return;
+    applyGlow(e);
+    card.classList.add('touch-glow');
+  }, {passive:true});
+
+  document.addEventListener('pointerup', function(e){
+    const card = e.target.closest(selector);
+    if(!card) return;
+    setTimeout(function(){ card.classList.remove('touch-glow'); }, 650);
+  }, {passive:true});
+
+  document.addEventListener('pointercancel', function(e){
+    const card = e.target.closest(selector);
+    if(card) card.classList.remove('touch-glow');
+  }, {passive:true});
+})();
+
 </script>
 </body>
 </html>
