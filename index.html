@@ -429,6 +429,118 @@ details.touch-glow::after{
 /* Evita que o brilho superior atrapalhe tabelas */
 .table-wrap::after, .table-wrap::before{display:none!important;}
 
+
+
+/* Ajuste solicitado: manter a borda superior colorida, sem efeito de iluminação no hover/touch */
+.card,
+.scenario-card,
+.kpi,
+.audit-card,
+.growth-card,
+.insight,
+.input-row,
+details{
+  border:1px solid rgba(var(--edge-rgb),.22)!important;
+  border-top:4px solid rgba(var(--edge-rgb),.96)!important;
+  background:
+    linear-gradient(180deg, rgba(var(--edge-rgb),.055), rgba(17,24,39,.92) 30%, rgba(15,23,42,.94))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 18px 52px rgba(0,0,0,.30)!important;
+  transform:none!important;
+}
+
+.card::before,
+.scenario-card::before,
+.kpi::before,
+.audit-card::before,
+.growth-card::before,
+.insight::before,
+.input-row::before,
+details::before,
+.card::after,
+.scenario-card::after,
+.kpi::after,
+.audit-card::after,
+.growth-card::after,
+.insight::after,
+.input-row::after,
+details::after{
+  display:none!important;
+  opacity:0!important;
+}
+
+.card:hover,
+.scenario-card:hover,
+.kpi:hover,
+.audit-card:hover,
+.growth-card:hover,
+.insight:hover,
+.input-row:hover,
+details:hover,
+.card:focus-within,
+.scenario-card:focus-within,
+.kpi:focus-within,
+.audit-card:focus-within,
+.growth-card:focus-within,
+.insight:focus-within,
+.input-row:focus-within,
+details:focus-within,
+.card.touch-glow,
+.scenario-card.touch-glow,
+.kpi.touch-glow,
+.audit-card.touch-glow,
+.growth-card.touch-glow,
+.insight.touch-glow,
+.input-row.touch-glow,
+details.touch-glow{
+  transform:none!important;
+  border-color:rgba(var(--edge-rgb),.22)!important;
+  border-top-color:rgba(var(--edge-rgb),.96)!important;
+  background:
+    linear-gradient(180deg, rgba(var(--edge-rgb),.055), rgba(17,24,39,.92) 30%, rgba(15,23,42,.94))!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.05),
+    0 18px 52px rgba(0,0,0,.30)!important;
+  filter:none!important;
+}
+
+.card:hover::before,
+.scenario-card:hover::before,
+.kpi:hover::before,
+.audit-card:hover::before,
+.growth-card:hover::before,
+.insight:hover::before,
+.input-row:hover::before,
+details:hover::before,
+.card:hover::after,
+.scenario-card:hover::after,
+.kpi:hover::after,
+.audit-card:hover::after,
+.growth-card:hover::after,
+.insight:hover::after,
+.input-row:hover::after,
+details:hover::after,
+.card.touch-glow::before,
+.scenario-card.touch-glow::before,
+.kpi.touch-glow::before,
+.audit-card.touch-glow::before,
+.growth-card.touch-glow::before,
+.insight.touch-glow::before,
+.input-row.touch-glow::before,
+details.touch-glow::before,
+.card.touch-glow::after,
+.scenario-card.touch-glow::after,
+.kpi.touch-glow::after,
+.audit-card.touch-glow::after,
+.growth-card.touch-glow::after,
+.insight.touch-glow::after,
+.input-row.touch-glow::after,
+details.touch-glow::after{
+  display:none!important;
+  opacity:0!important;
+}
+
 </style>
 </head>
 <body class="premise-closed">
