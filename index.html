@@ -40,14 +40,28 @@ details{border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgb
 .dre-group td{background:rgba(255,255,255,.045);font-weight:900}.dre-sub td:first-child{padding-left:28px;color:#d1d5db}.dre-total td{background:rgba(255,214,10,.12);font-weight:1000}.dre-result td{background:rgba(157,255,0,.07);font-weight:1000}.rent-highlight td{background:rgba(255,214,10,.10);border-top:1px solid rgba(255,214,10,.20);border-bottom:1px solid rgba(255,214,10,.20)}.rent-note{display:block;color:var(--yellow);font-size:11px;margin-top:3px}.audit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.audit-card{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}.audit-card span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:900}.audit-card strong{display:block;margin-top:6px;font-size:18px}.audit-table{min-width:720px}.audit-note{margin-top:12px;padding:11px 12px;border-radius:14px;background:rgba(255,214,10,.08);border:1px solid rgba(255,214,10,.22);color:#fde68a;font-size:13px;line-height:1.4}.monthly-table{min-width:1700px}.pb-first-row td{background:rgba(255,214,10,.24)!important;color:#fff7cc;border-top:1px solid rgba(255,214,10,.65);border-bottom:1px solid rgba(255,214,10,.65);font-weight:900}.pb-first-row td:first-child:before{content:"PB → ";color:var(--yellow);font-weight:1000}.growth-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.growth-card{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);border-radius:16px;padding:12px}.growth-card span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;font-weight:900}.growth-card strong{display:block;margin-top:6px;font-size:20px}.growth-card small{display:block;margin-top:6px;color:#cbd5e1;line-height:1.35}
 .insights{grid-template-columns:repeat(2,1fr)}.insight{padding:14px;border-radius:18px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1)}.insight h4{margin:0 0 8px}.insight p{margin:6px 0;color:#cbd5e1;font-size:13px;line-height:1.35}.sev-Alta{border-left:4px solid var(--red)}.sev-Média{border-left:4px solid var(--yellow)}.sev-Baixa{border-left:4px solid var(--green)}.footer{text-align:center;color:var(--muted);font-size:12px;line-height:1.5;padding:28px}
 @media(max-width:1120px){.top,.chart-grid{grid-template-columns:1fr}.controls{position:relative;top:0;max-height:none}.scenario-cards{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.insights{grid-template-columns:1fr}.header-actions{display:none}}@media(max-width:640px){.audit-grid,.growth-grid{grid-template-columns:1fr}.container{padding:12px}.card-body{padding:13px}.kpi-row,.mini-kpis{grid-template-columns:1fr}.canvas-wrap{height:300px}.canvas-wrap.tall{height:340px}.subtitle{display:none}.logo{width:34px;height:34px}table{min-width:880px}}
+
+/* Navegação limpa: premissas ficam em uma tela própria, acessada pelo menu. */
+body.premise-closed .controls{display:none}
+body.premise-closed .top{grid-template-columns:1fr}
+body.premissas-open .top{grid-template-columns:1fr}
+body.premissas-open .top>section.grid{display:none}
+body.premissas-open main.container>section:not(.top){display:none}
+body.premissas-open .footer{display:none}
+body.premissas-open .controls{display:block;position:relative;top:0;max-height:none;overflow:visible;width:100%}
+.premissas-nav{display:flex;justify-content:flex-end;margin-bottom:12px}
+body.premise-closed .premissas-back{display:none}
+@media(max-width:1120px){.header-actions{display:flex;gap:8px;flex-wrap:wrap}.header-inner{align-items:flex-start;flex-direction:column}.header-actions .btn{padding:9px 11px;font-size:12px}}
+
 @media print{.controls,.header-actions{display:none}.header{position:relative}body{background:#fff;color:#111827}.card{box-shadow:none;break-inside:avoid}}
 </style>
 </head>
-<body>
-<header class="header"><div class="header-inner"><div class="brand"><div class="logo"></div><div><h1>Dashboard Trans Obra — Viabilidade por Cenário</h1><p class="subtitle">DRE, payback, lucro, CDI e estrutura FOZ com premissas editáveis</p></div></div><div class="header-actions"><button class="btn secondary" onclick="resetControls()">Restaurar premissas</button><button class="btn" onclick="window.print()">Imprimir / PDF</button></div></div></header>
+<body class="premise-closed">
+<header class="header"><div class="header-inner"><div class="brand"><div class="logo"></div><div><h1>Dashboard Trans Obra — Viabilidade por Cenário</h1><p class="subtitle">DRE, payback, lucro, CDI e estrutura FOZ com premissas editáveis</p></div></div><div class="header-actions"><button class="btn" onclick="showPremissas()">Premissas</button><button class="btn secondary" onclick="resetControls()">Restaurar premissas</button><button class="btn secondary" onclick="window.print()">Imprimir / PDF</button></div></div></header>
 <main class="container">
 <section class="grid top">
   <aside class="card controls"><div class="card-body">
+    <div class="premissas-nav"><button class="btn secondary premissas-back" onclick="showAnalise()">← Voltar à análise</button></div>
     <h2>Premissas</h2>
     <p class="sub">Todos os campos da aba <strong>05_PREMISSAS</strong> estão aqui. Ao editar uma premissa, o DRE, o PB, os gráficos, o CDI e os indicadores recalculam automaticamente.</p>
     <div class="premise-block">
@@ -101,6 +115,8 @@ function parseBR(v){let s=String(v??'').trim().replace(/[^0-9,.-]/g,''); if(!s)r
 function displayInputValue(value, unit){if(value===null||value===undefined)return''; if(typeof value==='string')return value; if(String(unit||'').includes('%'))return num(value*100,2); if(String(unit||'').includes('x'))return num(value,4); return num(value,2)}
 function valueFromInput(el, unit){let v=parseBR(el.value); return String(unit||'').includes('%') ? v/100 : v}
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function showPremissas(){document.body.classList.remove('premise-closed');document.body.classList.add('premissas-open');window.scrollTo({top:0,behavior:'smooth'});}
+function showAnalise(){document.body.classList.remove('premissas-open');document.body.classList.add('premise-closed');window.scrollTo({top:0,behavior:'smooth'});}
 
 function cdiMensal(){return Math.pow(1+(+state.cdiAnual||0),1/12)-1}
 function monthlyGrowth(g){return Math.pow(1+(+g||0),1/12)-1}
