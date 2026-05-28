@@ -27,7 +27,7 @@ h1{font-size:clamp(18px,2.3vw,30px);margin:0}.subtitle{margin:4px 0 0;color:var(
 select,input.prem-input{width:100%;background:#07111f;color:#fff;border:1px solid var(--border);border-radius:12px;padding:10px;font-weight:800;outline:none}
 input.prem-input:focus,select:focus{border-color:rgba(157,255,0,.65);box-shadow:0 0 0 3px rgba(157,255,0,.10)}
 input.prem-input[readonly]{opacity:.75;background:rgba(255,255,255,.055);color:#d1d5db}
-.field-grid{display:grid;grid-template-columns:1fr;gap:9px}.input-row{padding:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:16px}
+.field-grid{display:grid;grid-template-columns:1fr;gap:9px}.horizon-edit{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}.horizon-edit .btn{height:42px}.input-row{padding:10px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.035);border-radius:16px}
 .input-head{display:flex;justify-content:space-between;gap:8px;align-items:start;margin-bottom:7px}.input-title{font-size:12px;font-weight:900;color:#f8fafc}.input-unit{font-size:11px;color:var(--yellow);font-weight:900;white-space:nowrap}
 .input-foot{font-size:11px;color:var(--muted);line-height:1.32;margin-top:7px}.row-ref{color:#64748b;font-weight:800}.pill{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:10px;font-weight:900;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#cbd5e1}
 .note-mini{padding:10px 12px;border-radius:14px;background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.24);font-size:12px;color:#ddfbff;line-height:1.45}
@@ -50,6 +50,8 @@ body.premissas-open main.container>section:not(.top){display:none}
 body.premissas-open .footer{display:none}
 body.premissas-open .controls{display:block;position:relative;top:0;max-height:none;overflow:visible;width:100%}
 .premissas-nav{display:flex;justify-content:flex-end;margin-bottom:12px}
+.premissas-back{background:linear-gradient(135deg,var(--lime),var(--cyan))!important;color:#06111f!important;border:0!important;box-shadow:0 0 26px rgba(157,255,0,.55),0 0 18px rgba(34,211,238,.25);font-size:14px;letter-spacing:.2px}
+.premissas-back:hover{filter:brightness(1.08);transform:translateY(-1px)}
 body.premise-closed .premissas-back{display:none}
 @media(max-width:1120px){.header-actions{display:flex;gap:8px;flex-wrap:wrap}.header-inner{align-items:flex-start;flex-direction:column}.header-actions .btn{padding:9px 11px;font-size:12px}}
 
@@ -66,7 +68,8 @@ body.premise-closed .premissas-back{display:none}
     <p class="sub">Todos os campos da aba <strong>05_PREMISSAS</strong> estão aqui. Ao editar uma premissa, o DRE, o PB, os gráficos, o CDI e os indicadores recalculam automaticamente.</p>
     <div class="premise-block">
       <div class="control"><label>Cenário em foco <b id="focusLabel">Moderado</b></label><select id="focusScenario" onchange="onInputChange()"><option value="moderado">Moderado</option><option value="pessimista">Pessimista</option><option value="otimista">Otimista</option></select></div>
-      <div class="control"><label>Horizonte da análise <b id="horizonVal">60 meses</b></label><input id="horizon" class="prem-input" type="text" value="60" data-key="horizon" oninput="onInputChange()"></div>
+      <div class="control"><label>Horizonte da análise <b id="horizonVal">60 meses</b></label><div class="horizon-edit"><input id="horizon" class="prem-input" type="number" min="12" max="60" step="1" value="60" data-key="horizon" oninput="onHorizonInput()" onchange="onHorizonCommit()"><button type="button" class="btn small" onclick="onHorizonCommit()">Aplicar</button></div><div class="input-foot">Digite um número entre 12 e 60 meses e clique em Aplicar.</div></div>
+      <div class="control"><label>Curva FOZ para projeção <b id="fozCurveLabel">Suavizada</b></label><select id="fozCurveMode" onchange="onInputChange()"><option value="suavizada">Suavizada — remove quedas pontuais</option><option value="real">Real — mantém histórico FOZ</option></select><div class="note-mini" style="margin-top:10px">Para Paranaguá, a curva suavizada evita que um mês isolado de FOZ derrube a projeção. A opção real mantém as oscilações históricas.</div></div>
     </div>
     <div id="premissasFields"></div>
   </div></aside>
@@ -78,7 +81,7 @@ body.premise-closed .premissas-back{display:none}
 </section>
 
 <section class="grid chart-grid" style="margin-top:16px">
-  <div class="card chart-card"><div class="card-body"><h3>Receita mensal — comparação dos cenários</h3><p class="sub">Curvas recalculadas por peso FOZ, normalização por equipamentos, uplift e crescimento anual.</p><div class="canvas-wrap"><canvas id="revenueChart"></canvas></div></div></div>
+  <div class="card chart-card"><div class="card-body"><h3>Receita mensal — comparação dos cenários</h3><p class="sub">Curvas recalculadas por peso FOZ, normalização, opção de curva FOZ real/suavizada, uplift e crescimento anual.</p><div class="canvas-wrap"><canvas id="revenueChart"></canvas></div></div></div>
   <div class="card chart-card"><div class="card-body"><h3>Payback por cenário</h3><p class="sub">Mês em que o caixa acumulado pós-CAPEX fica positivo.</p><div class="canvas-wrap"><canvas id="pbChart"></canvas></div></div></div>
 </section>
 
@@ -105,6 +108,7 @@ const labelsScenario={pessimista:'Pessimista',moderado:'Moderado',otimista:'Otim
 const colorsScenario={pessimista:COLORS.pess,moderado:COLORS.mod,otimista:COLORS.opt};
 let charts={};
 let state=structuredClone(DATA.defaults);
+state.curvaFoz = state.curvaFoz || 'suavizada';
 
 function $(id){return document.getElementById(id)}
 function brl(v,d=0){return (v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:d,minimumFractionDigits:d})}
@@ -117,6 +121,8 @@ function valueFromInput(el, unit){let v=parseBR(el.value); return String(unit||'
 function escapeHtml(str){return String(str??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function showPremissas(){document.body.classList.remove('premise-closed');document.body.classList.add('premissas-open');window.scrollTo({top:0,behavior:'smooth'});}
 function showAnalise(){document.body.classList.remove('premissas-open');document.body.classList.add('premise-closed');window.scrollTo({top:0,behavior:'smooth'});}
+function onHorizonInput(){const el=$('horizon');const raw=parseBR(el.value);if(raw>0){setText('horizonVal',Math.round(raw)+' meses');}}
+function onHorizonCommit(){const el=$('horizon');let v=Math.round(parseBR(el.value)||state.horizon||60);v=Math.max(12,Math.min(60,v));state.horizon=v;el.value=v;setText('horizonVal',v+' meses');updateDashboard();}
 
 function cdiMensal(){return Math.pow(1+(+state.cdiAnual||0),1/12)-1}
 function monthlyGrowth(g){return Math.pow(1+(+g||0),1/12)-1}
@@ -174,13 +180,16 @@ function refreshInputs(){
   });
   $('focusScenario').value=state.focusScenario||'moderado';
   $('horizon').value=state.horizon||60;
+  const curveEl=$('fozCurveMode'); if(curveEl) curveEl.value=state.curvaFoz||'suavizada';
   setText('focusLabel',labelsScenario[state.focusScenario||'moderado']);
   setText('horizonVal',(state.horizon||60)+' meses');
+  setText('fozCurveLabel',(state.curvaFoz==='real'?'Real':'Suavizada'));
 }
 function setText(id,txt){const el=$(id);if(el)el.textContent=txt}
 
 function onInputChange(){
   state.focusScenario=$('focusScenario').value;
+  const curveEl=$('fozCurveMode'); if(curveEl) state.curvaFoz=curveEl.value||'suavizada';
   state.horizon=Math.max(12,Math.min(60,Math.round(parseBR($('horizon').value)||60)));
   const active=document.activeElement;
   const activeKey=active?.dataset?.key||'';
@@ -218,6 +227,7 @@ function onInputChange(){
 
 function resetControls(){
   state=structuredClone(DATA.defaults);
+  state.curvaFoz='suavizada';
   refreshInputs();
   updateDashboard();
 }
@@ -232,10 +242,16 @@ function buildCurve(base12,uplift,growth){
   for(let m=25;m<=60;m++) arr.push(m24*Math.pow(1+(+growth||0),(m-24)/12));
   return arr;
 }
+function suavizarCurvaSemQueda(arr){
+  const out=[];
+  arr.forEach((v,i)=>{out[i]=i===0?v:Math.max(v,out[i-1]);});
+  return out;
+}
 function scenarioCurves(){
   const rawFoz=DATA.fozNormalizedRevenue12Original.map(v=>v/(DATA.originalProjectEquip/DATA.originalFozEquip));
   const factor=(state.normalizarFoz==='SIM')?factorFoz():1;
-  const foz12=rawFoz.map(v=>v*factor);
+  const foz12Original=rawFoz.map(v=>v*factor);
+  const foz12=(state.curvaFoz==='real')?foz12Original:suavizarCurvaSemQueda(foz12Original);
   const w=+state.pesoFoz||0;
   const mod12=DATA.planRevenue12.map((v,i)=>v*(1-w)+foz12[i]*w);
   return {
@@ -334,8 +350,8 @@ function renderMonthlyTable(rows,h){
 }
 function auditMessage(changed,sums){
   const pbTxt=['pessimista','moderado','otimista'].map(k=>`${labelsScenario[k]} ${sums[k].pb?sums[k].pb+' meses':'Sem PB'}`).join(' · ');
-  if(changed.length===0) return `Conferência: HTML carregado com aluguel inicial de R$ 6.000 e pró-labore zerado. PB atual: ${pbTxt}.`;
-  return `Conferência: os cards, gráficos e tabelas estão calculando com as premissas alteradas listadas abaixo. PB atual: ${pbTxt}. Compare esta lista com a aba 05_PREMISSAS da planilha antes de validar.`;
+  if(changed.length===0) return `Conferência: HTML carregado com aluguel inicial de R$ 6.000, pró-labore zerado e curva FOZ ${state.curvaFoz==='real'?'real histórica':'suavizada para projeção'}. PB atual: ${pbTxt}.`;
+  return `Conferência: os cards, gráficos e tabelas estão calculando com as premissas alteradas listadas abaixo. Curva FOZ: ${state.curvaFoz==='real'?'real histórica':'suavizada para projeção'}. PB atual: ${pbTxt}. Compare esta lista com a aba 05_PREMISSAS da planilha antes de validar.`;
 }
 function renderAudit(sums){
   const changed=Object.keys(DATA.defaults.costs).map(k=>({conta:k,base:+DATA.defaults.costs[k]||0,atual:+state.costs[k]||0})).filter(x=>Math.abs(x.atual-x.base)>0.01);
