@@ -650,6 +650,23 @@ details::after,
 .detail-note{margin-top:12px;color:#cbd5e1;font-size:13px;line-height:1.45}
 @media(max-width:640px){.detail-overlay{align-items:flex-end;padding:10px}.detail-modal{width:100%;max-height:88vh;border-radius:20px 20px 14px 14px}.detail-head h3{font-size:18px}}
 
+/* Ajustes do demonstrativo mensal: coluna A/M compacta, PE (ponto de equilíbrio) e % LL */
+.period-cell{font-weight:1000;color:#dffcff;white-space:nowrap;text-align:center!important;letter-spacing:.2px}
+.pe-badge{display:inline-flex;align-items:center;justify-content:flex-end;min-width:96px;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:1000;letter-spacing:.15px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pe-ok{color:var(--lime);background:rgba(157,255,0,.08);border:1px solid rgba(157,255,0,.65);box-shadow:0 0 14px rgba(157,255,0,.24), inset 0 0 12px rgba(157,255,0,.07)}
+.pe-neg{color:#FB7185;background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.72);box-shadow:0 0 14px rgba(251,113,133,.30), inset 0 0 12px rgba(251,113,133,.08)}
+.monthly-table{min-width:1580px}
+
+
+
+/* Quadro específico de Ponto de Equilíbrio por cenário */
+.pe-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}
+.pe-summary-card{border:1px solid rgba(var(--edge-rgb),.22)!important;border-top:4px solid rgba(var(--edge-rgb),.72)!important;border-radius:18px;padding:14px;background:linear-gradient(180deg,rgba(var(--edge-rgb),.06),rgba(255,255,255,.035))!important}
+.pe-summary-card.pess{--edge-rgb:251,113,133}.pe-summary-card.mod{--edge-rgb:34,211,238}.pe-summary-card.opt{--edge-rgb:157,255,0}
+.pe-summary-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.pe-summary-title{font-weight:1000;font-size:16px}.pe-summary-month{font-size:12px;font-weight:1000;border-radius:999px;padding:5px 9px;border:1px solid rgba(255,255,255,.14);background:rgba(0,0,0,.16);white-space:nowrap}.pe-summary-value{font-size:clamp(24px,3vw,36px);font-weight:1000;line-height:1;margin:8px 0}.pe-summary-label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:900;letter-spacing:.5px}.pe-summary-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.pe-summary-kpi{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.14);border-radius:13px;padding:9px}.pe-summary-kpi span{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;font-weight:900}.pe-summary-kpi strong{display:block;margin-top:4px;font-size:12px;white-space:nowrap}.pe-pos{color:var(--lime)!important}.pe-neg-text{color:#FB7185!important}.pe-table{min-width:1180px}.pe-table th,.pe-table td{font-size:12px}.pe-table .pe-period{font-weight:1000;color:#dffcff;text-align:center}.pe-pill{display:inline-flex;justify-content:flex-end;min-width:86px;padding:3px 8px;border-radius:999px;font-weight:1000;font-variant-numeric:tabular-nums}.pe-pill.ok{color:var(--lime);background:rgba(157,255,0,.08);border:1px solid rgba(157,255,0,.55)}.pe-pill.bad{color:#FB7185;background:rgba(251,113,133,.08);border:1px solid rgba(251,113,133,.62)}
+@media(max-width:900px){.pe-summary-grid{grid-template-columns:1fr}.pe-summary-kpis{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:640px){.pe-summary-kpis{grid-template-columns:1fr}.pe-table{min-width:980px}}
+
 </style>
 </head>
 <body class="premise-closed">
@@ -692,6 +709,13 @@ details::after,
 <section class="card" style="margin-top:16px"><div class="card-body"><h3>DRE acumulado dos 3 cenários</h3><div class="table-wrap"><table id="dreSummaryTable"></table></div></div></section>
 <section class="card" style="margin-top:16px"><div class="card-body"><h3>Reinvestimento em equipamentos — 3 cenários</h3><p class="sub">Mostra o total reservado para reinvestimento no horizonte selecionado. A premissa fica editável em <strong>Premissas → Reinvestimento em novos equipamentos</strong> e começa no mês informado.</p><div class="grid kpi-row" id="reinvestKpis"></div></div></section>
 <section class="card" style="margin-top:16px"><div class="card-body"><h3>DRE anual do cenário em foco <span class="scenario-tag" id="titleAnnualTableScenario">(Moderado)</span></h3><div class="table-wrap"><table id="annualTable"></table></div></div></section>
+
+<section class="grid chart-grid" style="margin-top:16px">
+  <div class="card chart-card"><div class="card-body"><h3>Ponto de equilíbrio — folga/falta por cenário</h3><p class="sub">Gráfico direto para identificar quando cada cenário passa do PE. A linha zero é o ponto de equilíbrio: acima dela há folga; abaixo dela ainda falta receita.</p><div class="canvas-wrap"><canvas id="peGapChart"></canvas></div></div></div>
+  <div class="card"><div class="card-body"><h3>Quadro PE — 3 cenários</h3><p class="sub">Resumo do primeiro mês em que a receita supera o ponto de equilíbrio, usando a mesma lógica da planilha: <strong>PE = (Folha + OPEX + Sistema) ÷ (1 − Deduções − Desp. Financeiras − Royalties/FNP − Reinvestimento)</strong>.</p><div id="peSummaryCards" class="pe-summary-grid"></div></div></div>
+</section>
+<section class="card" style="margin-top:16px"><div class="card-body"><h3>Tabela comparativa do PE por mês</h3><p class="sub">Valores em verde-limão indicam receita acima do PE; valores em vermelho neon indicam receita abaixo do PE. A coluna “Folga/Falta” mostra Receita − PE.</p><div class="table-wrap"><table id="peScenarioTable" class="pe-table"></table></div></div></section>
+
 <section class="card" style="margin-top:16px"><div class="card-body"><h3>Demonstrativo mensal completo — cenário em foco <span class="scenario-tag" id="titleMonthlyScenario">(Moderado)</span></h3><p class="sub">Mostra mês a mês a receita, crescimento mensal efetivo, equivalência mensal das taxas anualizadas, despesas, lucro, caixa acumulado e PB. Esta tabela acompanha as premissas editáveis.</p><div class="table-wrap"><table id="monthlyTable" class="monthly-table"></table></div></div></section>
 <section class="card" style="margin-top:16px"><div class="card-body"><h3>Insights e pontos de atenção da COF</h3><p class="sub">Checklist gerencial antes de avançar.</p><div class="grid insights" id="insightsGrid"></div></div></section>
 
@@ -1018,6 +1042,17 @@ function showMonthlyDetail(category,rowIndex){
     title='Caixa pós-CAPEX'; total=r.caixa;
     rows=[['Investimento inicial','CAPEX recuperado pelo projeto',brl(-(+state.investimentoTotal||0),0)],['Lucros acumulados até o mês','Soma do lucro gerencial mês a mês',brl(r.caixa+(+state.investimentoTotal||0),0)],['Caixa pós-CAPEX','Lucros acumulados - investimento inicial',brl(r.caixa,0)]];
     note='Quando esse valor fica positivo, o payback foi atingido.';
+  }else if(category==='pontoEquilibrio'){
+    const pe=monthlyBreakEven(r);
+    title='Ponto de equilíbrio mensal'; total=pe.valor;
+    rows=[
+      ['Custos fixos considerados','Folha + OPEX + sistema homologado',brl(pe.fixedCosts,0)],
+      ['Percentuais sobre a receita','Deduções + despesas financeiras + royalties/FNP + reinvestimento ativo',pct(pe.variableRate,2)],
+      ['Margem de contribuição','1 - percentuais sobre receita',pct(pe.contributionMargin,2)],
+      ['Receita do mês','Comparativo com o ponto de equilíbrio',brl(r.receita,0)],
+      ['Diferença receita vs PE','Receita - PE',brl((r.receita||0)-pe.valor,0)]
+    ];
+    note=pe.atingido?'A receita do mês ficou acima do ponto de equilíbrio. Por isso o PE aparece em verde-limão.':'A receita do mês ficou abaixo do ponto de equilíbrio. Por isso o PE aparece em vermelho neon.';
   }else{
     title='Detalhamento'; total=0; rows=[['Sem detalhamento específico','','-']];
   }
@@ -1029,6 +1064,63 @@ function showMonthlyDetail(category,rowIndex){
 function closeMonthlyDetail(){const el=$('detailOverlay'); if(el) el.classList.remove('open');}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMonthlyDetail();});
 
+function monthlyBreakEven(row){
+  const reinvestRate = row.mes >= (+state.reinvestMes||13) ? (+state.reinvestPct||0) : 0;
+  const variableRate = (+state.deducoes||0) + (+state.despesasFinanceiras||0) + (+state.royaltiesFnp||0) + reinvestRate;
+  const contributionMargin = Math.max(0.0001, 1 - variableRate);
+  const fixedCosts = (row.folha||0) + (row.opex||0) + (+state.sistemaHomologado||0);
+  const valor = fixedCosts / contributionMargin;
+  return {valor, atingido:(row.receita||0) >= valor, variableRate, contributionMargin, fixedCosts, reinvestRate};
+}
+
+
+function breakEvenForRow(row){
+  return monthlyBreakEven(row);
+}
+function breakEvenSeries(rows,h){
+  return rows.slice(0,h).map(r=>{
+    const pe=breakEvenForRow(r);
+    return {...r, peValor:pe.valor, peFolga:(r.receita||0)-pe.valor, peAtingido:pe.atingido, peFixedCosts:pe.fixedCosts, peVariableRate:pe.variableRate, peContributionMargin:pe.contributionMargin};
+  });
+}
+function firstBreakEven(rows,h){
+  const serie=breakEvenSeries(rows,h);
+  return serie.find(r=>r.peAtingido) || null;
+}
+function renderPeSummary(data,h){
+  const el=$('peSummaryCards');
+  if(!el) return;
+  const cfg=[['pessimista','Pessimista','pess'],['moderado','Moderado','mod'],['otimista','Otimista','opt']];
+  el.innerHTML=cfg.map(([key,label,cls])=>{
+    const first=firstBreakEven(data[key],h);
+    if(!first){
+      const last=breakEvenSeries(data[key],h).at(-1);
+      return `<div class="pe-summary-card ${cls}"><div class="pe-summary-head"><div class="pe-summary-title">${label}</div><div class="pe-summary-month pe-neg-text">Sem PE</div></div><div class="pe-summary-value pe-neg-text">${brl(last?.peValor||0,0)}</div><div class="pe-summary-label">PE do último mês analisado</div><div class="pe-summary-kpis"><div class="pe-summary-kpi"><span>Receita</span><strong>${brl(last?.receita||0,0)}</strong></div><div class="pe-summary-kpi"><span>Folga/Falta</span><strong class="pe-neg-text">${brl(last?.peFolga||0,0)}</strong></div><div class="pe-summary-kpi"><span>Horizonte</span><strong>${h} meses</strong></div></div></div>`;
+    }
+    const gapClass=first.peFolga>=0?'pe-pos':'pe-neg-text';
+    return `<div class="pe-summary-card ${cls}"><div class="pe-summary-head"><div class="pe-summary-title">${label}</div><div class="pe-summary-month pe-pos">Mês ${first.mes}</div></div><div class="pe-summary-value ${gapClass}">${brl(first.peValor,0)}</div><div class="pe-summary-label">PE no primeiro mês superado</div><div class="pe-summary-kpis"><div class="pe-summary-kpi"><span>Receita</span><strong>${brl(first.receita,0)}</strong></div><div class="pe-summary-kpi"><span>Folga</span><strong class="${gapClass}">${brl(first.peFolga,0)}</strong></div><div class="pe-summary-kpi"><span>Etapa</span><strong>${first.etapa}</strong></div></div></div>`;
+  }).join('');
+}
+function renderPeScenarioTable(data,h){
+  const el=$('peScenarioTable');
+  if(!el) return;
+  const cfg=[['pessimista','Pessimista'],['moderado','Moderado'],['otimista','Otimista']];
+  const series=Object.fromEntries(cfg.map(([k])=>[k,breakEvenSeries(data[k],h)]));
+  const rows=months(h).map((m,idx)=>{
+    const ano=Math.floor((m-1)/12)+1;
+    const mesAno=((m-1)%12)+1;
+    const periodo=`${String(ano).padStart(2,'0')}/${String(mesAno).padStart(2,'0')}`;
+    return `<tr><td class="pe-period">${periodo}</td>`+cfg.map(([k])=>{
+      const r=series[k][idx];
+      const cls=r.peFolga>=0?'ok':'bad';
+      return `<td>${brl(r.receita,0)}</td><td>${brl(r.peValor,0)}</td><td><span class="pe-pill ${cls}">${brl(r.peFolga,0)}</span></td>`;
+    }).join('')+`</tr>`;
+  }).join('');
+  const headerTop=`<tr><th rowspan="2">A/M</th>${cfg.map(([k,label])=>`<th colspan="3">${label}</th>`).join('')}</tr>`;
+  const headerBottom=`<tr>${cfg.map(()=>`<th>Receita</th><th>PE</th><th>Folga/Falta</th>`).join('')}</tr>`;
+  el.innerHTML=`<thead>${headerTop}${headerBottom}</thead><tbody>${rows}</tbody>`;
+}
+
 function renderMonthlyTable(rows,h){
   let subset=rows.slice(0,h);
   currentMonthlyRows=subset;
@@ -1036,13 +1128,16 @@ function renderMonthlyTable(rows,h){
   let body=subset.map((r,i)=>{
     const cresc=i===0?0:(r.receita/(subset[i-1].receita||r.receita)-1);
     const ano=Math.floor((r.mes-1)/12)+1;
+    const mesAno=((r.mes-1)%12)+1;
+    const periodo=`${String(ano).padStart(2,'0')}/${String(mesAno).padStart(2,'0')}`;
     const hitPb=r.caixa>=0;
     const firstPb=hitPb&&!pbPainted;
     if(firstPb) pbPainted=true;
-    const status=hitPb?'PB atingido':'Sem PB';
-    return `<tr class="${firstPb?'pb-first-row':''}"><td>${r.mes}</td><td>${ano}</td><td>${r.etapa}</td><td>${brl(r.receita,0)}</td><td>${pct(cresc,2)}</td>${clickableCell('deducoes',i,brl(r.deducoes,0))}${clickableCell('financeiras',i,brl(r.financeiras,0))}${clickableCell('royalties',i,brl(r.royalties,0))}${clickableCell('folha',i,brl(r.folha,0))}${clickableCell('opex',i,brl(r.opex,0))}${clickableCell('aluguel',i,brl(r.details['Aluguel/Ocupação']||0,0))}${clickableCell('prolabore',i,brl(r.details['Pró-labore']||0,0))}${clickableCell('reinvestimento',i,brl(r.reinvestimento,0))}${clickableCell('despesasTotais',i,brl(r.despesasTotais,0))}${clickableCell('lucro',i,brl(r.lucro,0),r.lucro<0?'neg':'pos')}${clickableCell('lucratividade',i,pct(r.margem,1))}${clickableCell('caixa',i,brl(r.caixa,0),r.caixa<0?'neg':'pos')}<td>${status}</td></tr>`;
+    const pe=monthlyBreakEven(r);
+    const peBadge=`<span class="pe-badge ${pe.atingido?'pe-ok':'pe-neg'}" title="Ponto de equilíbrio mensal: receita necessária para lucro zero">${brl(pe.valor,0)}</span>`;
+    return `<tr class="${firstPb?'pb-first-row':''}"><td class="period-cell" title="Ano/Mês — ${periodo}">${periodo}</td><td>${r.etapa}</td><td>${brl(r.receita,0)}</td><td>${pct(cresc,2)}</td>${clickableCell('deducoes',i,brl(r.deducoes,0))}${clickableCell('financeiras',i,brl(r.financeiras,0))}${clickableCell('royalties',i,brl(r.royalties,0))}${clickableCell('folha',i,brl(r.folha,0))}${clickableCell('opex',i,brl(r.opex,0))}${clickableCell('aluguel',i,brl(r.details['Aluguel/Ocupação']||0,0))}${clickableCell('prolabore',i,brl(r.details['Pró-labore']||0,0))}${clickableCell('reinvestimento',i,brl(r.reinvestimento,0))}${clickableCell('despesasTotais',i,brl(r.despesasTotais,0))}${clickableCell('lucro',i,brl(r.lucro,0),r.lucro<0?'neg':'pos')}${clickableCell('lucratividade',i,pct(r.margem,1))}${clickableCell('caixa',i,brl(r.caixa,0),r.caixa<0?'neg':'pos')}<td class="detail-cell" onclick="showMonthlyDetail('pontoEquilibrio',${i})" title="Clique para detalhar o ponto de equilíbrio">${peBadge}</td></tr>`;
   }).join('');
-  $('monthlyTable').innerHTML=`<thead><tr><th>Mês</th><th>Ano</th><th>Etapa</th><th>Receita</th><th>Cresc. mês</th><th>Deduções</th><th>Desp. financeiras</th><th>Royalties+Sistema</th><th>Folha</th><th>OPEX</th><th>Aluguel</th><th>Pró-labore</th><th>Reinvest.</th><th>Despesas totais</th><th>Lucro</th><th>Lucratividade</th><th>Caixa pós-CAPEX</th><th>Status</th></tr></thead><tbody>${body}</tbody>`
+  $('monthlyTable').innerHTML=`<thead><tr><th>A/M</th><th>Etapa</th><th>Receita</th><th>Cresc. mês</th><th>Deduções</th><th>Desp. financeiras</th><th>Royalties+Sistema</th><th>Folha</th><th>OPEX</th><th>Aluguel</th><th>Pró-labore</th><th>Reinvest.</th><th>Despesas totais</th><th>Lucro</th><th>% LL</th><th>Caixa pós-CAPEX</th><th>PE</th></tr></thead><tbody>${body}</tbody>`
 }
 function auditMessage(changed,sums){
   const pbTxt=['pessimista','moderado','otimista'].map(k=>`${labelsScenario[k]} ${sums[k].pb?sums[k].pb+' meses':'Sem PB'}`).join(' · ');
@@ -1058,6 +1153,8 @@ function renderAudit(sums){
 function renderInsights(){if($('insightsGrid').dataset.done)return;$('insightsGrid').dataset.done='1';$('insightsGrid').innerHTML=DATA.insights.map(x=>`<div class="insight sev-${escapeHtml(x.severidade)}"><h4>${escapeHtml(x.tema)} <span class="badge ${x.severidade==='Alta'?'bad':x.severidade==='Média'?'warn':'ok'}">${escapeHtml(x.severidade)}</span></h4><p><strong>${escapeHtml(x.classificacao)}:</strong> ${escapeHtml(x.impacto)}</p><p><strong>Risco:</strong> ${escapeHtml(x.risco)}</p><p><strong>Ação:</strong> ${escapeHtml(x.acao)}</p></div>`).join('')}
 
 function createCharts(data,sums,h){let labs=months(h);chart('revenueChart',{type:'line',data:{labels:labs,datasets:[line('Pessimista',COLORS.pess,data.pessimista,'receita',h),line('Moderado',COLORS.mod,data.moderado,'receita',h),line('Otimista',COLORS.opt,data.otimista,'receita',h)]},options:opts({scales:{x:{ticks:{color:'#CBD5E1',maxTicksLimit:12},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#CBD5E1',callback:v=>shortBRL(v)},grid:{color:COLORS.grid}}}})})
+let peSets=['pessimista','moderado','otimista'].map(k=>({key:k,serie:breakEvenSeries(data[k],h)}));
+chart('peGapChart',{type:'line',data:{labels:labs,datasets:[...peSets.map(x=>({label:labelsScenario[x.key],data:x.serie.map(r=>r.peFolga),borderColor:colorsScenario[x.key],backgroundColor:colorsScenario[x.key]+'22',borderWidth:3.25,tension:.42,cubicInterpolationMode:'monotone',pointRadius:0,pointHitRadius:14,pointHoverRadius:6,pointHoverBackgroundColor:colorsScenario[x.key],pointHoverBorderColor:'#fff',pointHoverBorderWidth:2,borderCapStyle:'round',borderJoinStyle:'round'})),{label:'Linha do PE',data:labs.map(_=>0),borderColor:COLORS.yellow,borderDash:[7,6],borderWidth:2,pointRadius:0}]},options:opts({plugins:{legend:{position:'bottom',labels:{color:COLORS.text,usePointStyle:true,boxWidth:10}},tooltip:{backgroundColor:'rgba(15,23,42,.96)',titleColor:'#fff',bodyColor:'#e5e7eb',borderColor:'rgba(255,255,255,.15)',borderWidth:1,callbacks:{label:ctx=>`${ctx.dataset.label}: ${brl(ctx.raw||0,0)} de ${ctx.raw>=0?'folga':'falta'}`}}},scales:{x:{ticks:{color:'#CBD5E1',maxTicksLimit:12},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#CBD5E1',callback:v=>shortBRL(v)},grid:{color:COLORS.grid}}}})})
 let pbVals=['pessimista','moderado','otimista'].map(k=>sums[k].pb||61);chart('pbChart',{type:'bar',data:{labels:['Pessimista','Moderado','Otimista'],datasets:[{data:pbVals,label:'Mês do PB',backgroundColor:[COLORS.pess+'bb',COLORS.mod+'bb',COLORS.opt+'bb'],borderColor:[COLORS.pess,COLORS.mod,COLORS.opt],borderWidth:2}]},options:opts({indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw>60?'Sem PB até 60m':'PB no mês '+ctx.raw}}},scales:{x:{min:0,max:60,ticks:{color:'#CBD5E1'},grid:{color:COLORS.grid}},y:{ticks:{color:'#CBD5E1'},grid:{display:false}}}})})
 let ds=[line('Pessimista',COLORS.pess,data.pessimista,'caixa',h),line('Moderado',COLORS.mod,data.moderado,'caixa',h),line('Otimista',COLORS.opt,data.otimista,'caixa',h),{label:'Linha zero/PB',data:labs.map(_=>0),borderColor:COLORS.yellow,borderDash:[7,6],borderWidth:2,pointRadius:0}];['pessimista','moderado','otimista'].forEach(k=>{let pb=sums[k].pb;if(pb&&pb<=h)ds.push({type:'scatter',label:'PB '+labelsScenario[k],data:[{x:pb,y:data[k][pb-1].caixa}],backgroundColor:colorsScenario[k],borderColor:'#fff',borderWidth:2,pointRadius:8})});chart('cashChart',{type:'line',data:{labels:labs,datasets:ds},options:opts({scales:{x:{type:'linear',min:1,max:h,ticks:{color:'#CBD5E1',stepSize:6},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#CBD5E1',callback:v=>shortBRL(v)},grid:{color:COLORS.grid}}}})})
 let f=data[state.focusScenario];chart('cdiChart',{type:'line',data:{labels:labs,datasets:[{label:'Caixa '+labelsScenario[state.focusScenario],data:f.slice(0,h).map(r=>r.caixa),borderColor:colorsScenario[state.focusScenario],backgroundColor:colorsScenario[state.focusScenario]+'33',borderWidth:3.25,tension:.42,cubicInterpolationMode:'monotone',pointRadius:0,pointHitRadius:14,pointHoverRadius:6,pointHoverBackgroundColor:colorsScenario[state.focusScenario],pointHoverBorderColor:'#fff',pointHoverBorderWidth:2,borderCapStyle:'round',borderJoinStyle:'round'},{label:'Ganho CDI bruto',data:labs.map(m=>cdiGain(m)),borderColor:COLORS.yellow,backgroundColor:COLORS.yellow+'22',borderDash:[8,5],borderWidth:3,tension:.42,cubicInterpolationMode:'monotone',pointRadius:0,pointHitRadius:14,pointHoverRadius:5,borderCapStyle:'round',borderJoinStyle:'round'}]},options:opts({scales:{x:{ticks:{color:'#CBD5E1',maxTicksLimit:12},grid:{color:'rgba(255,255,255,.05)'}},y:{ticks:{color:'#CBD5E1',callback:v=>shortBRL(v)},grid:{color:COLORS.grid}}}})})
@@ -1070,7 +1167,7 @@ function updateDashboard(){
   const data=recalc();
   const h=Math.max(12,Math.min(60,+state.horizon||60));
   const sums={pessimista:sumRows(data.pessimista,h),moderado:sumRows(data.moderado,h),otimista:sumRows(data.otimista,h)};
-  updateScenarioTitleTags();renderGrowthRates();renderCards(sums);renderFocusKpis(sums,h);renderReinvestKpis(sums,h);renderAudit(sums);renderDreTable(sums);renderAnnualTable(data[state.focusScenario]);renderMonthlyTable(data[state.focusScenario],h);renderInsights();createCharts(data,sums,h);
+  updateScenarioTitleTags();renderGrowthRates();renderCards(sums);renderFocusKpis(sums,h);renderReinvestKpis(sums,h);renderAudit(sums);renderDreTable(sums);renderAnnualTable(data[state.focusScenario]);renderPeSummary(data,h);renderPeScenarioTable(data,h);renderMonthlyTable(data[state.focusScenario],h);renderInsights();createCharts(data,sums,h);
 }
 document.addEventListener('DOMContentLoaded',()=>{buildPremissasUI();updateDashboard();});
 
